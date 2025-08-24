@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Jumping Crying Game</title>
+  <style>
+    body { margin: 0; overflow: hidden; background: #f0f0f0; }
+    canvas { display: block; margin: auto; background: white; }
+  </style>
+</head>
+<body>
+<canvas id="gameCanvas" width="600" height="400"></canvas>
+<audio id="crySound" src="cry.mp3"></audio>
+
+<script>
+  const canvas = document.getElementById("gameCanvas");
+  const ctx = canvas.getContext("2d");
+
+  let player = { x: 100, y: 350, w: 40, h: 40, vy: 0, jumping: false };
+  let enemy = { x: 600, y: 350, w: 40, h: 40, speed: 4 };
+  const gravity = 0.5;
+  const crySound = document.getElementById("crySound");
+
+  function drawPlayer() {
+    ctx.fillStyle = "blue";
+    ctx.fillRect(player.x, player.y, player.w, player.h);
+  }
+
+  function drawEnemy() {
+    ctx.fillStyle = "red";
+    ctx.fillRect(enemy.x, enemy.y, enemy.w, enemy.h);
+  }
+
+  function update() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Player movement
+    player.y += player.vy;
+    player.vy += gravity;
+
+    if (player.y >= 350) {
+      player.y = 350;
+      player.jumping = false;
+    }
+
+    // Enemy movement
+    enemy.x -= enemy.speed;
+    if (enemy.x + enemy.w < 0) {
+      enemy.x = canvas.width;
+    }
+
+    // Collision
+    if (player.x < enemy.x + enemy.w &&
+        player.x + player.w > enemy.x &&
+        player.y < enemy.y + enemy.h &&
+        player.y + player.h > enemy.y) {
+      crySound.play();
+    }
+
+    drawPlayer();
+    drawEnemy();
+
+    requestAnimationFrame(update);
+  }
+
+  // Jump control
+  document.addEventListener("keydown", (e) => {
+    if (e.code === "Space" && !player.jumping) {
+      player.vy = -10;
+      player.jumping = true;
+    }
+  });
+
+  update();
+</script>
+</body>
+</html>
